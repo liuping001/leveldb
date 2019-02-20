@@ -40,6 +40,7 @@ namespace {
 
 // An entry is a variable length heap-allocated structure.  Entries
 // are kept in a circular doubly linked list ordered by access time.
+// 一个分配堆上面的可变长度的entry。同时多个entry组成一个环形双向链表，并按访问时间排序
 struct LRUHandle {
   void* value;
   void (*deleter)(const Slice&, void* value);
@@ -48,7 +49,7 @@ struct LRUHandle {
   LRUHandle* prev;
   size_t charge;      // TODO(opt): Only allow uint32_t?
   size_t key_length;
-  bool in_cache;      // Whether entry is in the cache.
+  bool in_cache;      // Whether entry is in the cache. // entry是否在缓存中
   uint32_t refs;      // References, including cache reference, if present.
   uint32_t hash;      // Hash of key(); used for fast sharding and comparisons
   char key_data[1];   // Beginning of key
@@ -56,6 +57,7 @@ struct LRUHandle {
   Slice key() const {
     // next_ is only equal to this if the LRU handle is the list head of an
     // empty list. List heads never have meaningful keys.
+    // 只有节点是空链表的头节点是才会next==this。列表头的key 没有任何意义
     assert(next != this);
 
     return Slice(key_data, key_length);
@@ -76,6 +78,7 @@ class HandleTable {
     return *FindPointer(key, hash);
   }
 
+  // 如何old插入的时候存在，old直接被淘汰 elems不++
   LRUHandle* Insert(LRUHandle* h) {
     LRUHandle** ptr = FindPointer(h->key(), h->hash);
     LRUHandle* old = *ptr;
@@ -105,13 +108,14 @@ class HandleTable {
  private:
   // The table consists of an array of buckets where each bucket is
   // a linked list of cache entries that hash into the bucket.
-  uint32_t length_;
-  uint32_t elems_;
-  LRUHandle** list_;
+  uint32_t length_; // 容量
+  uint32_t elems_;  // 元素个数
+  LRUHandle** list_; //一个LRUHandle*类型的数组
 
   // Return a pointer to slot that points to a cache entry that
   // matches key/hash.  If there is no such cache entry, return a
   // pointer to the trailing slot in the corresponding linked list.
+  // 返回指向与键/哈希匹配的缓存条目。 如果没有这样的缓存条目，则返回。。。。。
   LRUHandle** FindPointer(const Slice& key, uint32_t hash) {
     LRUHandle** ptr = &list_[hash & (length_ - 1)];
     while (*ptr != nullptr &&
@@ -121,7 +125,8 @@ class HandleTable {
     return ptr;
   }
 
-  void Resize() {
+  // next_hash的值源自再哈希，因为不会再插入的时候保留两个冲突的值
+  void Resize() { // 再哈希
     uint32_t new_length = 4;
     while (new_length < elems_) {
       new_length *= 2;
@@ -261,11 +266,13 @@ Cache::Handle* LRUCache::Lookup(const Slice& key, uint32_t hash) {
   return reinterpret_cast<Cache::Handle*>(e);
 }
 
+// refs -1
 void LRUCache::Release(Cache::Handle* handle) {
   MutexLock l(&mutex_);
   Unref(reinterpret_cast<LRUHandle*>(handle));
 }
 
+// refs +2
 Cache::Handle* LRUCache::Insert(
     const Slice& key, uint32_t hash, void* value, size_t charge,
     void (*deleter)(const Slice& key, void* value)) {
@@ -304,6 +311,7 @@ Cache::Handle* LRUCache::Insert(
   return reinterpret_cast<Cache::Handle*>(e);
 }
 
+// refs -1
 // If e != nullptr, finish removing *e from the cache; it has already been
 // removed from the hash table.  Return whether e != nullptr.
 bool LRUCache::FinishErase(LRUHandle* e) {
@@ -317,6 +325,7 @@ bool LRUCache::FinishErase(LRUHandle* e) {
   return e != nullptr;
 }
 
+// refs -1
 void LRUCache::Erase(const Slice& key, uint32_t hash) {
   MutexLock l(&mutex_);
   FinishErase(table_.Remove(key, hash));

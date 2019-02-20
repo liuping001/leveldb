@@ -113,42 +113,42 @@ TEST(CacheTest, Erase) {
 }
 
 TEST(CacheTest, EntriesArePinned) {
-  Insert(100, 101);
-  Cache::Handle* h1 = cache_->Lookup(EncodeKey(100));
+  Insert(100, 101); // 100 refs 1
+  Cache::Handle* h1 = cache_->Lookup(EncodeKey(100)); // 100 refs 2
   ASSERT_EQ(101, DecodeValue(cache_->Value(h1)));
 
-  Insert(100, 102);
+  Insert(100, 102); // new 100 refs 2; old 100 refs 1, rm from table
   Cache::Handle* h2 = cache_->Lookup(EncodeKey(100));
   ASSERT_EQ(102, DecodeValue(cache_->Value(h2)));
   ASSERT_EQ(0, deleted_keys_.size());
 
-  cache_->Release(h1);
+  cache_->Release(h1); // old 100 refs 0
   ASSERT_EQ(1, deleted_keys_.size());
   ASSERT_EQ(100, deleted_keys_[0]);
   ASSERT_EQ(101, deleted_values_[0]);
 
-  Erase(100);
+  Erase(100); // rm new 100 from table, refs 1
   ASSERT_EQ(-1, Lookup(100));
   ASSERT_EQ(1, deleted_keys_.size());
 
-  cache_->Release(h2);
+  cache_->Release(h2); // new 100 refs 0
   ASSERT_EQ(2, deleted_keys_.size());
   ASSERT_EQ(100, deleted_keys_[1]);
   ASSERT_EQ(102, deleted_values_[1]);
 }
 
 TEST(CacheTest, EvictionPolicy) {
-  Insert(100, 101);
-  Insert(200, 201);
-  Insert(300, 301);
-  Cache::Handle* h = cache_->Lookup(EncodeKey(300));
+  Insert(100, 101);// 100 refs 1
+  Insert(200, 201);// 200 refs 1
+  Insert(300, 301);// 300 refs 1
+  Cache::Handle* h = cache_->Lookup(EncodeKey(300)); // 300 refs 2
 
   // Frequently used entry must be kept around,
   // as must things that are still in use.
   for (int i = 0; i < kCacheSize + 100; i++) {
     Insert(1000+i, 2000+i);
     ASSERT_EQ(2000+i, Lookup(1000+i));
-    ASSERT_EQ(101, Lookup(100));
+    ASSERT_EQ(101, Lookup(100)); // 100 refs kCacheSize + 100 + 2
   }
   ASSERT_EQ(101, Lookup(100));
   ASSERT_EQ(-1, Lookup(200));
@@ -160,7 +160,7 @@ TEST(CacheTest, UseExceedsCacheSize) {
   // Overfill the cache, keeping handles on all inserted entries.
   std::vector<Cache::Handle*> h;
   for (int i = 0; i < kCacheSize + 100; i++) {
-    h.push_back(InsertAndReturnHandle(1000+i, 2000+i));
+    h.push_back(InsertAndReturnHandle(1000+i, 2000+i)); // refs 2
   }
 
   // Check that all the entries can be found in the cache.

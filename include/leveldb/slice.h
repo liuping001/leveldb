@@ -12,6 +12,11 @@
 // non-const method, all threads accessing the same Slice must use
 // external synchronization.
 
+
+// Slice是一个指向某些外部的指针存储和大小简单的结构。Slice的使用者必须确保slice在相应的外部存储器释放后不在使用。
+//
+// 在不加锁的情况下，多个线程可以调用Slice上的const方法。但如果任何线程可能调用非const方法，访问相同Slice的所有线程必须加锁。
+
 #ifndef STORAGE_LEVELDB_INCLUDE_SLICE_H_
 #define STORAGE_LEVELDB_INCLUDE_SLICE_H_
 
