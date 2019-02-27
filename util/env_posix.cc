@@ -302,7 +302,7 @@ class PosixWritableFile final : public WritableFile {
     // This needs to happen before the manifest file is flushed to disk, to
     // avoid crashing in a state where the manifest refers to files that are not
     // yet on disk.
-    Status status = SyncDirIfManifest();
+    Status status = SyncDirIfManifest();  // 目录
     if (!status.ok()) {
       return status;
     }
@@ -312,7 +312,7 @@ class PosixWritableFile final : public WritableFile {
       return status;
     }
 
-    return SyncFd(fd_, filename_);
+    return SyncFd(fd_, filename_); // 文件
   }
 
  private:
@@ -509,11 +509,13 @@ class PosixEnv : public Env {
       return PosixError(filename, errno);
     }
 
+    // 如果mmap—_limiter使用完毕，才使用fb_limiter
     if (!mmap_limiter_.Acquire()) {
-      *result = new PosixRandomAccessFile(filename, fd, &fd_limiter_);
+      *result = new PosixRandomAccessFile(filename, fd, &fd_limiter_); // fd_limiter_表示同时能打开的最大文件数，超过最大值，打开读一次就close掉
       return Status::OK();
     }
 
+    // 优先使用mmap
     uint64_t file_size;
     Status status = GetFileSize(filename, &file_size);
     if (status.ok()) {

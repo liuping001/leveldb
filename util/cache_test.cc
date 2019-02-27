@@ -210,10 +210,10 @@ TEST(CacheTest, Prune) {
   Insert(1, 100);
   Insert(2, 200);
 
-  Cache::Handle* handle = cache_->Lookup(EncodeKey(1));
+  Cache::Handle* handle = cache_->Lookup(EncodeKey(1)); // 1 refs 2
   ASSERT_TRUE(handle);
   cache_->Prune();
-  cache_->Release(handle);
+  cache_->Release(handle); // 1 refs 1;in to lru
 
   ASSERT_EQ(100, Lookup(1));
   ASSERT_EQ(-1, Lookup(2));

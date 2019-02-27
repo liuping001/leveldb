@@ -37,7 +37,7 @@ namespace {
 // Elements are moved between these lists by the Ref() and Unref() methods,
 // when they detect an element in the cache acquiring or losing its only
 // external reference.
-
+//
 // An entry is a variable length heap-allocated structure.  Entries
 // are kept in a circular doubly linked list ordered by access time.
 // 一个分配堆上面的可变长度的entry。同时多个entry组成一个环形双向链表，并按访问时间排序
@@ -198,6 +198,10 @@ class LRUCache {
   // Entries are in use by clients, and have refs >= 2 and in_cache==true.
   LRUHandle in_use_ GUARDED_BY(mutex_);
 
+  // 从table中删除的方式
+    // 1、主动调用erase删除
+    // 2、插入时超出容量，在table中删除lru中的超出容量的部分
+    // 3、调用Prune，在table中删除所有lru中的key
   HandleTable table_ GUARDED_BY(mutex_);
 };
 

@@ -52,6 +52,7 @@ class LEVELDB_EXPORT Env {
   // NotFound status when the file does not exist.
   //
   // The returned file will only be accessed by one thread at a time.
+    // 顺序读文件。返回的结果同时只在一个线程使用
   virtual Status NewSequentialFile(const std::string& fname,
                                    SequentialFile** result) = 0;
 
@@ -63,6 +64,7 @@ class LEVELDB_EXPORT Env {
   // not exist.
   //
   // The returned file may be concurrently accessed by multiple threads.
+    // 随机读文件。返回的结果同时可能在多个线程使用
   virtual Status NewRandomAccessFile(const std::string& fname,
                                      RandomAccessFile** result) = 0;
 
@@ -73,6 +75,7 @@ class LEVELDB_EXPORT Env {
   // returns non-OK.
   //
   // The returned file will only be accessed by one thread at a time.
+    // 写指定文件。只读，如果文件之前存在就清空。同时只有一个线程操作
   virtual Status NewWritableFile(const std::string& fname,
                                  WritableFile** result) = 0;
 

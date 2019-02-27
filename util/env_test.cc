@@ -40,10 +40,11 @@ TEST(EnvTest, ReadWrite) {
   ASSERT_OK(env_->NewWritableFile(test_file_name, &writable_file));
 
   // Fill a file with data generated via a sequence of randomly sized writes.
+      // 向文件写入一系列随机大小的数据
   static const size_t kDataSize = 10 * 1048576;
   std::string data;
   while (data.size() < kDataSize) {
-    int len = rnd.Skewed(18);  // Up to 2^18 - 1, but typically much smaller
+    int len = rnd.Skewed(18);  // Up to 2^18 - 1, but typically much smaller 但通常要小得多
     std::string r;
     test::RandomString(&rnd, len, &r);
     ASSERT_OK(writable_file->Append(r));
@@ -57,6 +58,7 @@ TEST(EnvTest, ReadWrite) {
   delete writable_file;
 
   // Read all data using a sequence of randomly sized reads.
+      // 对于上面写入的数据，全部读出来，每次读取的长度随机
   SequentialFile* sequential_file;
   ASSERT_OK(env_->NewSequentialFile(test_file_name, &sequential_file));
   std::string read_result;
