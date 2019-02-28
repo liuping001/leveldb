@@ -21,9 +21,11 @@ class Snapshot;
 // sequence of key,value pairs.  Each block may be compressed before
 // being stored in a file.  The following enum describes which
 // compression method (if any) is used to compress a block.
+// 数据的内容保存在一个block集合中，每个block中都是一系列的key,value。在保存block进文件前会对其压缩，下面是压缩方法的枚举
 enum CompressionType {
   // NOTE: do not change the values of existing entries, as these are
   // part of the persistent format on disk.
+  // 不要改变已经枚举出来的值，应该他们已经使用，并保存在了磁盘中
   kNoCompression     = 0x0,
   kSnappyCompression = 0x1
 };
@@ -39,6 +41,8 @@ struct LEVELDB_EXPORT Options {
   // REQUIRES: The client must ensure that the comparator supplied
   // here has the same name and orders keys *exactly* the same as the
   // comparator provided to previous open calls on the same DB.
+  // 比较器为table中的key排序，一个比较器默认安装字典序排序。
+  // 对于同一个db，比较器必须要具有相同的名字，并且对key的排序都是相同的
   const Comparator* comparator;
 
   // If true, the database will be created if it is missing.
@@ -128,7 +132,7 @@ struct LEVELDB_EXPORT Options {
   // Compress blocks using the specified compression algorithm.  This
   // parameter can be changed dynamically.
   //
-  // Default: kSnappyCompression, which gives lightweight but fast
+  // Default: kSnappyCompression, which gives lightweight 轻量级 but fast
   // compression.
   //
   // Typical speeds of kSnappyCompression on an Intel(R) Core(TM)2 2.4GHz:
@@ -139,6 +143,7 @@ struct LEVELDB_EXPORT Options {
   // worth switching to kNoCompression.  Even if the input data is
   // incompressible, the kSnappyCompression implementation will
   // efficiently detect that and will switch to uncompressed mode.
+  // 它的速度比一般直接写的数据快，所以一般不值得切换到不压缩模式。尽管数据是不可压缩的，kSnappy也会有效的检测到，然后切换到不压缩模式
   CompressionType compression;
 
   // EXPERIMENTAL: If true, append to existing MANIFEST and log files

@@ -312,6 +312,7 @@ if(LEVELDB_BUILD_TESTS)
     leveldb_test("${PROJECT_SOURCE_DIR}/util/crc32c_test.cc")
     leveldb_test("${PROJECT_SOURCE_DIR}/util/hash_test.cc")
     leveldb_test("${PROJECT_SOURCE_DIR}/util/logging_test.cc")
+    leveldb_test("${PROJECT_SOURCE_DIR}/util/comparator_my_test.cpp")
 
     # TODO(costan): This test also uses
     #               "${PROJECT_SOURCE_DIR}/util/env_posix_test_helper.h"

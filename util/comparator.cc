@@ -27,7 +27,9 @@ class BytewiseComparatorImpl : public Comparator {
   virtual int Compare(const Slice& a, const Slice& b) const {
     return a.compare(b);
   }
-
+  // helloabc
+  // hellocac
+  // reslut:healla->heallb
   virtual void FindShortestSeparator(
       std::string* start,
       const Slice& limit) const {
@@ -51,7 +53,7 @@ class BytewiseComparatorImpl : public Comparator {
       }
     }
   }
-
+  // abc -> b
   virtual void FindShortSuccessor(std::string* key) const {
     // Find first character that can be incremented
     size_t n = key->size();
