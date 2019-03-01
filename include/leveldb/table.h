@@ -49,6 +49,7 @@ class LEVELDB_EXPORT Table {
   // Returns a new iterator over the table contents.
   // The result of NewIterator() is initially invalid (caller must
   // call one of the Seek methods on the iterator before using it).
+    // 返回一个invalid迭代器，在使用的时候必须先调用seek方法
   Iterator* NewIterator(const ReadOptions&) const;
 
   // Given a key, return an approximate byte offset in the file where
@@ -57,6 +58,7 @@ class LEVELDB_EXPORT Table {
   // bytes, and so includes effects like compression of the underlying data.
   // E.g., the approximate offset of the last key in the table will
   // be close to the file length.
+    // 返回key在文件中的近似偏移
   uint64_t ApproximateOffsetOf(const Slice& key) const;
 
  private:

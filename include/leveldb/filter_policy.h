@@ -12,7 +12,8 @@
 //
 // Most people will want to use the builtin bloom filter support (see
 // NewBloomFilterPolicy() below).
-
+// 这个对象通过一组keys产生一个小过滤器。这些过滤器存在leveldb中由leveldb自动查阅
+// 以决定是否从磁盘中读取数据。大多数情况下，过滤器可以减少DB::Get读取磁盘文件的次数
 #ifndef STORAGE_LEVELDB_INCLUDE_FILTER_POLICY_H_
 #define STORAGE_LEVELDB_INCLUDE_FILTER_POLICY_H_
 

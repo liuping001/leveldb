@@ -3,6 +3,7 @@
 # found in the LICENSE file. See the AUTHORS file for names of contributors.
 
 cmake_minimum_required(VERSION 3.7)
+
 project(leveldb VERSION 1.21.0 LANGUAGES C CXX)
 
 # This project can use C11, but will gracefully decay down to C89.
