@@ -59,7 +59,7 @@ void FilterBlockBuilder::GenerateFilter() {
 
   // Make list of keys from flattened key structure
   start_.push_back(keys_.size());  // Simplify length computation
-  tmp_keys_.resize(num_keys);
+  tmp_keys_.resize(num_keys); // todo ??? 为什么要分开为start keys然后又组装成temp_keys
   for (size_t i = 0; i < num_keys; i++) {
     const char* base = keys_.data() + start_[i];
     size_t length = start_[i+1] - start_[i];

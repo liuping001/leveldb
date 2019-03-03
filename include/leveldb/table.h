@@ -36,6 +36,7 @@ class LEVELDB_EXPORT Table {
   // for the duration of the returned table's lifetime.
   //
   // *file must remain live while this Table is in use.
+    // 从文件中读取table出来
   static Status Open(const Options& options,
                      RandomAccessFile* file,
                      uint64_t file_size,
